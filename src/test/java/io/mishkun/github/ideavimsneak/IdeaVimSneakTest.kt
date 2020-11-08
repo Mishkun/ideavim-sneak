@@ -33,6 +33,12 @@ class IdeaVimSneakTest : VimTestCase() {
         doTest("sxt", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
+    fun testSneakForwardIgnoreCase() {
+        val before = "som${c}e teXt"
+        val after = "some te${c}Xt"
+
+        doTest("sxt", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    }
 
     fun testSneakForwardAndFindAgain() {
         val before = "som${c}e text text"
@@ -41,10 +47,31 @@ class IdeaVimSneakTest : VimTestCase() {
         doTest("sxt;", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
+    fun testSneakForwardAndFindReverseAgain() {
+        val before = "some tex${c}t text"
+        val after = "some ${c}text text"
+
+        doTest("ste,", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    }
+
     fun testSneakBackward() {
         val before = "some tex${c}t"
         val after = "so${c}me text"
 
         doTest("Sme", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    }
+
+    fun testSneakBackwardAndFindAgain() {
+        val before = "some text text${c}"
+        val after = "some ${c}text text"
+
+        doTest("Ste;", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    }
+
+    fun testSneakBackwardAndFindReverseAgain() {
+        val before = "some tex${c}t text"
+        val after = "some text ${c}text"
+
+        doTest("Ste,", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 }

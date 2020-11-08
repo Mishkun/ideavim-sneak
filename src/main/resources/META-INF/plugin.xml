@@ -9,6 +9,10 @@
     It helps you navigate in line effortlessly.
     In short, it is like `f` and `F`, but accepting two characters instead of one. It makes your movement at least 1000%
     more precise and accurate.
+
+    Use `s` plus two characters to search forward in line
+    Use `S` plus two characters to search backward in line
+    Use `;` and `,` just as with `f` and `F` commands to repeat searches
     ]]></description>
 
     <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
@@ -20,7 +24,4 @@
         <vimExtension implementation="io.github.mishkun.ideavimsneak.IdeaVimSneakExtension"/>
     </extensions>
 
-    <projectListeners>
-
-    </projectListeners>
 </idea-plugin>

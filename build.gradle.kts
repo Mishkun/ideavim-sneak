@@ -1,3 +1,5 @@
+import org.jetbrains.intellij.tasks.PublishTask
+
 plugins {
     id("org.jetbrains.intellij") version "0.6.2"
     kotlin("jvm") version "1.4.10"
@@ -5,7 +7,7 @@ plugins {
 
 
 group = "io.github.mishkun"
-version = "1.0-SNAPSHOT"
+version = "1.0"
 
 repositories {
     mavenCentral()
@@ -17,9 +19,14 @@ intellij {
     setPlugins("IdeaVIM:0.60")
 }
 
+tasks.withType<PublishTask> {
+    val intellijPublishToken: String? by project
+    token(intellijPublishToken)
+}
+
 tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml") {
     changeNotes("""
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>""")
+        Initial plugin release
+      """)
 }
 

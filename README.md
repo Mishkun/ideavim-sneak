@@ -25,3 +25,7 @@ After IdeaVim reboot you can use this plugin
 ## License
 
 Just as IdeaVim, this plugin is licensed under the terms of the GNU Public License version 2 or any later version.
+
+## Credits
+
+Plugin icon is merged icons of IdeaVim plugin and a random sneaker by FreePic from flaticon.com

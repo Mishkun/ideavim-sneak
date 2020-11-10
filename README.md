@@ -2,7 +2,7 @@
 
 # IdeaVim-Sneak
 
-![download](https://img.shields.io/jetbrains/plugin/d/15348-ideavim-sneak?label=plugin&style=flat-square)
+[![JetBrains IntelliJ Plugins](https://img.shields.io/jetbrains/plugin/v/15348-ideavim-sneak?label=dowload%20plugin)](https://plugins.jetbrains.com/plugin/15348-ideavim-sneak) 
 
 IdeaVim-Sneak is a port of [vim-sneak](https://github.com/justinmk/vim-sneak) for [IdeaVim](https://github.com/JetBrains/ideavim).
 

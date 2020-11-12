@@ -38,3 +38,6 @@ tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml
     setUntilBuild("")
 }
 
+tasks.withType<org.jetbrains.intellij.tasks.RunPluginVerifierTask> {
+    setIdeVersions("IIC-203.5784.10")
+}

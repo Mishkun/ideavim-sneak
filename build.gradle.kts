@@ -19,6 +19,10 @@ intellij {
     setPlugins("IdeaVIM:0.60")
 }
 
+dependencies {
+    testImplementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7")
+}
+
 tasks.withType<PublishTask> {
     val intellijPublishToken: String? by project
     token(intellijPublishToken)

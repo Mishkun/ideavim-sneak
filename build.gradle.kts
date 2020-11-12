@@ -7,7 +7,7 @@ plugins {
 
 
 group = "io.github.mishkun"
-version = "1.0.3"
+version = "1.0.4"
 
 repositories {
     mavenCentral()
@@ -19,6 +19,10 @@ intellij {
     setPlugins("IdeaVIM:0.60")
 }
 
+dependencies {
+    testImplementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7")
+}
+
 tasks.withType<PublishTask> {
     val intellijPublishToken: String? by project
     token(intellijPublishToken)
@@ -27,8 +31,13 @@ tasks.withType<PublishTask> {
 tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml") {
     changeNotes("""
         Set maximum compatible version to `open` to remove restrictions on nightly IDE versions
+        
+        This time, do it properly, kudos to @AlexPl292
       """)
     setSinceBuild("201")
     setUntilBuild("")
 }
 
+tasks.withType<org.jetbrains.intellij.tasks.RunPluginVerifierTask> {
+    setIdeVersions("IIC-203.5784.10")
+}

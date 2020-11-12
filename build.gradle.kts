@@ -7,7 +7,7 @@ plugins {
 
 
 group = "io.github.mishkun"
-version = "1.0.3"
+version = "1.0.4"
 
 repositories {
     mavenCentral()
@@ -27,6 +27,8 @@ tasks.withType<PublishTask> {
 tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml") {
     changeNotes("""
         Set maximum compatible version to `open` to remove restrictions on nightly IDE versions
+        
+        This time, do it properly, kudos to @AlexPl292
       """)
     setSinceBuild("201")
     setUntilBuild("")

@@ -19,10 +19,10 @@ package io.github.mishkun.ideavimsneak
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.ScrollType
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
-import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StringHelper
 import java.awt.event.KeyEvent
 
@@ -89,33 +89,31 @@ class IdeaVimSneakExtension : VimExtension {
 
         private fun jumpTo(editor: Editor, charone: Char, chartwo: Char, sneakDirection: Direction) {
             val caret = editor.caretModel.primaryCaret
-            val line: Int = caret.logicalPosition.line
-            val position = caret.logicalPosition.column + sneakDirection.offset
-            val start = EditorHelper.getLineStartOffset(editor, line)
-            val end = EditorHelper.getLineEndOffset(editor, line, true)
+            val position = caret.offset
             val chars = editor.document.charsSequence
-            val foundPosition = sneakDirection.findBiChar(chars, start, end, position, charone, chartwo)
+            val foundPosition = sneakDirection.findBiChar(chars, position, charone, chartwo)
             foundPosition?.let(editor.caretModel::moveToOffset)
+            editor.scrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE)
         }
     }
 
     private enum class Direction(val offset: Int) {
-        FORWARD(2) {
-            override fun findBiChar(charSequence: CharSequence, start: Int, end: Int, position: Int, charone: Char, chartwo: Char): Int? {
-                for (i in (start + position) until end) {
-                    if (charSequence[i].equals(charone, ignoreCase = true) &&
-                        charSequence[i + 1].equals(chartwo, ignoreCase = true)) {
+        FORWARD(1) {
+            override fun findBiChar(charSequence: CharSequence, position: Int, charone: Char, chartwo: Char): Int? {
+                for (i in (position + offset) until charSequence.length - 1) {
+                    if (charSequence[i] == charone &&
+                            charSequence[i + 1] == chartwo) {
                         return i
                     }
                 }
                 return null
             }
         },
-        BACKWARD(-2) {
-            override fun findBiChar(charSequence: CharSequence, start: Int, end: Int, position: Int, charone: Char, chartwo: Char): Int? {
-                for (i in (start + position) downTo start) {
-                    if (charSequence[i].equals(charone, ignoreCase = true) &&
-                        charSequence[i + 1].equals(chartwo, ignoreCase = true)) {
+        BACKWARD(-1) {
+            override fun findBiChar(charSequence: CharSequence, position: Int, charone: Char, chartwo: Char): Int? {
+                for (i in (position + offset) downTo 0) {
+                    if (charSequence[i] == charone &&
+                            charSequence[i + 1] == chartwo) {
                         return i
                     }
                 }
@@ -123,7 +121,7 @@ class IdeaVimSneakExtension : VimExtension {
             }
 
         };
-        abstract fun findBiChar(charSequence: CharSequence, start: Int, end: Int, position: Int, charone: Char, chartwo: Char): Int?
+        abstract fun findBiChar(charSequence: CharSequence, position: Int, charone: Char, chartwo: Char): Int?
     }
 
     private enum class RepeatDirection(val symb: String) {

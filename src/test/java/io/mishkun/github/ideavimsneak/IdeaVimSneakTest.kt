@@ -33,9 +33,20 @@ class IdeaVimSneakTest : VimTestCase() {
         doTest("sxt", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
-    fun testSneakForwardIgnoreCase() {
+    fun testSneakForwardVertical() {
+        val before = """som${c}e text
+        another line
+        third line"""
+        val after = """some text
+        another line
+        thi${c}rd line"""
+
+        doTest("srd", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    }
+
+    fun testSneakForwardDoNotIgnoreCase() {
         val before = "som${c}e teXt"
-        val after = "some te${c}Xt"
+        val after = "som${c}e teXt"
 
         doTest("sxt", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
@@ -61,9 +72,21 @@ class IdeaVimSneakTest : VimTestCase() {
         doTest("Sme", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
+    fun testSneakBackwardVertical() {
+        val before = """some text
+        another line
+        thi${c}rd line"""
+        val after = """so${c}me text
+        another line
+        third line"""
+
+        doTest("Sme", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    }
+
     fun testSneakBackwardAndFindAgain() {
-        val before = "some text text${c}"
-        val after = "some ${c}text text"
+        // caret has to be before another character (space here)
+        val before = "some text text${c} "
+        val after = "some ${c}text text "
 
         doTest("Ste;", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
@@ -73,5 +96,31 @@ class IdeaVimSneakTest : VimTestCase() {
         val after = "some text ${c}text"
 
         doTest("Ste,", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    }
+
+    fun testEndOfFile() {
+        val before = """first line
+        some te${c}xt
+        another line
+        last line."""
+        val after = """first line
+        some text
+        another line
+        last lin${c}e."""
+
+        doTest("se.", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    }
+
+    fun testStartOfFile() {
+        val before = """first line
+        some text
+        another${c} line
+        last line."""
+        val after = """${c}first line
+        some text
+        another line
+        last line."""
+
+        doTest("Sfi", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 }

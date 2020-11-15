@@ -15,10 +15,12 @@
     </p>
 
     <ul>
-    <li>Use `s` plus two characters to search forward in line</li>
-    <li>Use `S` plus two characters to search backward in line</li>
+    <li>Use `s` plus two characters to search forward in document</li>
+    <li>Use `S` plus two characters to search backward in document</li>
     <li>Use `;` and `,` just as with `f` and `F` commands to repeat searches</li>
     </ul>
+
+    <p>Add `set sneak` to your ./ideavimrc file for activation</p>
     ]]></description>
 
     <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html

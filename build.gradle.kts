@@ -7,7 +7,7 @@ plugins {
 
 
 group = "io.github.mishkun"
-version = "1.0.4"
+version = "1.1.0"
 
 repositories {
     mavenCentral()
@@ -30,9 +30,9 @@ tasks.withType<PublishTask> {
 
 tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml") {
     changeNotes("""
-        Set maximum compatible version to `open` to remove restrictions on nightly IDE versions
+        Now this plugin supports vertical jumps! Thanks @jannes for that!
         
-        This time, do it properly, kudos to @AlexPl292
+        Executing s or S command will now wrap across lines!
       """)
     setSinceBuild("201")
     setUntilBuild("")

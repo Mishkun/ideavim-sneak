@@ -1,6 +1,7 @@
 /*
     IdeaVim-Sneak plugin for IdeaVim mimicking vim-sneak plugin
     Copyright (C) 2020 Mikhail Levchenko
+    Copyright (C) IdeaVim Authors
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,21 +18,35 @@
  */
 package io.github.mishkun.ideavimsneak
 
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ScrollType
+import com.intellij.openapi.editor.colors.EditorColors
+import com.intellij.openapi.editor.markup.*
+import com.intellij.openapi.util.Disposer
+import com.maddyhome.idea.vim.VimProjectService
+import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
+import com.maddyhome.idea.vim.extension.highlightedyank.DEFAULT_HIGHLIGHT_DURATION
 import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.option.StrictMode
+import java.awt.Font
 import java.awt.event.KeyEvent
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
+private const val DEFAULT_HIGHLIGHT_DURATION: Long = 300
 class IdeaVimSneakExtension : VimExtension {
     override fun getName(): String = "sneak"
 
     override fun init() {
-        mapToFunctionAndProvideKeys("s", SneakHandler(Direction.FORWARD))
-        mapToFunctionAndProvideKeys("S", SneakHandler(Direction.BACKWARD))
+        val highlightHandler = HighlightHandler()
+        mapToFunctionAndProvideKeys("s", SneakHandler(highlightHandler, Direction.FORWARD))
+        mapToFunctionAndProvideKeys("S", SneakHandler(highlightHandler, Direction.BACKWARD))
 
         // workaround to support ; and , commands
         mapToFunctionAndProvideKeys("f", SneakMemoryHandler("f"))
@@ -39,15 +54,19 @@ class IdeaVimSneakExtension : VimExtension {
         mapToFunctionAndProvideKeys("t", SneakMemoryHandler("t"))
         mapToFunctionAndProvideKeys("T", SneakMemoryHandler("T"))
 
-        mapToFunctionAndProvideKeys(";", SneakRepeatHandler(RepeatDirection.IDENTICAL))
-        mapToFunctionAndProvideKeys(",", SneakRepeatHandler(RepeatDirection.REVERSE))
+        mapToFunctionAndProvideKeys(";", SneakRepeatHandler(highlightHandler, RepeatDirection.IDENTICAL))
+        mapToFunctionAndProvideKeys(",", SneakRepeatHandler(highlightHandler, RepeatDirection.REVERSE))
     }
 
-    private class SneakHandler(private val direction: Direction) : VimExtensionHandler {
+    private class SneakHandler(
+        private val highlightHandler: HighlightHandler,
+        private val direction: Direction
+    ) : VimExtensionHandler {
         override fun execute(editor: Editor, context: DataContext) {
             val charone = getChar(editor) ?: return
             val chartwo = getChar(editor) ?: return
-            jumpTo(editor, charone, chartwo, direction)
+            val range = jumpTo(editor, charone, chartwo, direction)
+            range?.let { highlightHandler.highlightSneakRange(editor, range) }
             lastSymbols = "${charone}${chartwo}"
             lastSDirection = direction
         }
@@ -71,12 +90,16 @@ class IdeaVimSneakExtension : VimExtension {
         }
     }
 
-    private class SneakRepeatHandler(private val direction: RepeatDirection) : VimExtensionHandler {
+    private class SneakRepeatHandler(
+        private val highlightHandler: HighlightHandler,
+        private val direction: RepeatDirection
+    ) : VimExtensionHandler {
         override fun execute(editor: Editor, context: DataContext) {
             val lastSDirection = lastSDirection
             if (lastSDirection != null) {
                 val (charone, chartwo) = lastSymbols.toList()
-                jumpTo(editor, charone, chartwo, direction.map(lastSDirection))
+                val jumpRange = jumpTo(editor, charone, chartwo, direction.map(lastSDirection))
+                jumpRange?.let { highlightHandler.highlightSneakRange(editor, jumpRange) }
             } else {
                 VimExtensionFacade.executeNormalWithoutMapping(StringHelper.parseKeys(direction.symb), editor)
             }
@@ -87,13 +110,14 @@ class IdeaVimSneakExtension : VimExtension {
         private var lastSDirection: Direction? = null
         private var lastSymbols: String = ""
 
-        private fun jumpTo(editor: Editor, charone: Char, chartwo: Char, sneakDirection: Direction) {
+        private fun jumpTo(editor: Editor, charone: Char, chartwo: Char, sneakDirection: Direction): TextRange? {
             val caret = editor.caretModel.primaryCaret
             val position = caret.offset
             val chars = editor.document.charsSequence
             val foundPosition = sneakDirection.findBiChar(chars, position, charone, chartwo)
             foundPosition?.let(editor.caretModel::moveToOffset)
             editor.scrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE)
+            return foundPosition?.let { TextRange(foundPosition, foundPosition + 2) }
         }
     }
 
@@ -135,5 +159,69 @@ class IdeaVimSneakExtension : VimExtension {
             }
         };
         abstract fun map(direction: Direction): Direction
+    }
+
+    private class HighlightHandler {
+        private var editor: Editor? = null
+        private val sneakHighlighters: MutableSet<RangeHighlighter> = mutableSetOf()
+
+        fun highlightSneakRange(editor: Editor, range: TextRange) {
+            clearAllSneakHighlighters()
+
+            this.editor = editor
+            val project = editor.project
+            if (project != null) {
+                Disposer.register(VimProjectService.getInstance(project)) {
+                    this.editor = null
+                    sneakHighlighters.clear()
+                }
+            }
+
+            if (range.isMultiple) {
+                for (i in 0 until range.size()) {
+                    highlightSingleRange(editor, range.startOffsets[i]..range.endOffsets[i])
+                }
+            } else {
+                highlightSingleRange(editor, range.startOffset..range.endOffset)
+            }
+        }
+
+        fun clearAllSneakHighlighters() {
+            sneakHighlighters.forEach { highlighter ->
+                editor?.markupModel?.removeHighlighter(highlighter) ?: StrictMode.fail("Highlighters without an editor")
+            }
+
+            sneakHighlighters.clear()
+        }
+
+        private fun highlightSingleRange(editor: Editor, range: ClosedRange<Int>) {
+            val highlighter = editor.markupModel.addRangeHighlighter(
+                range.start,
+                range.endInclusive,
+                HighlighterLayer.SELECTION,
+                getHighlightTextAttributes(),
+                HighlighterTargetArea.EXACT_RANGE
+            )
+
+            sneakHighlighters.add(highlighter)
+
+            setClearHighlightRangeTimer(highlighter)
+        }
+
+        private fun setClearHighlightRangeTimer(highlighter: RangeHighlighter) {
+            Executors.newSingleThreadScheduledExecutor().schedule({
+                ApplicationManager.getApplication().invokeLater {
+                    editor?.markupModel?.removeHighlighter(highlighter) ?: StrictMode.fail("Highlighters without an editor")
+                }
+            }, DEFAULT_HIGHLIGHT_DURATION, TimeUnit.MILLISECONDS)
+        }
+
+        private fun getHighlightTextAttributes() = TextAttributes(
+            null,
+            EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES.defaultAttributes.backgroundColor,
+            editor?.colorsScheme?.getColor(EditorColors.CARET_COLOR),
+            EffectType.SEARCH_MATCH,
+            Font.PLAIN
+        )
     }
 }

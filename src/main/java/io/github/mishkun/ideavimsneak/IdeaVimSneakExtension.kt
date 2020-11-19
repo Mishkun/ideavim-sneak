@@ -54,8 +54,8 @@ class IdeaVimSneakExtension : VimExtension {
 
         private fun getChar(editor: Editor): Char? {
             val key = VimExtensionFacade.inputKeyStroke(editor)
-            return when(key.keyCode) {
-                KeyEvent.VK_UNDEFINED, KeyEvent.VK_ESCAPE -> null
+            return when {
+                key.keyChar == KeyEvent.CHAR_UNDEFINED || key.keyCode == KeyEvent.VK_ESCAPE -> null
                 else -> key.keyChar
             }
         }

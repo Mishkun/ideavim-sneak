@@ -7,7 +7,7 @@ plugins {
 
 
 group = "io.github.mishkun"
-version = "1.1.0"
+version = "1.1.1"
 
 repositories {
     mavenCentral()
@@ -16,7 +16,7 @@ repositories {
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
     version = "2020.1"
-    setPlugins("IdeaVIM:0.60")
+    setPlugins("IdeaVIM:0.61")
 }
 
 dependencies {
@@ -30,9 +30,9 @@ tasks.withType<PublishTask> {
 
 tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml") {
     changeNotes("""
-        Now this plugin supports vertical jumps! Thanks @jannes for that!
-        
-        Executing s or S command will now wrap across lines!
+        - Enable escape symbol for interrupting sneak movement
+        - Add highlighting to found chars
+        - Update IdeaVim to 0.61
       """)
     setSinceBuild("201")
     setUntilBuild("")

@@ -123,4 +123,11 @@ class IdeaVimSneakTest : VimTestCase() {
 
         doTest("Sfi", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
+
+    fun testEscapeFirstChar() {
+        val before = "so${c}me dwarf"
+        val after = "some ${c}dwarf"
+
+        doTest("sa<ESC>sdw", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    }
 }

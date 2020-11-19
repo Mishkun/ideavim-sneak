@@ -45,19 +45,19 @@ class IdeaVimSneakExtension : VimExtension {
 
     private class SneakHandler(private val direction: Direction) : VimExtensionHandler {
         override fun execute(editor: Editor, context: DataContext) {
-            val charone = getChar(editor)
-            val chartwo = getChar(editor)
+            val charone = getChar(editor) ?: return
+            val chartwo = getChar(editor) ?: return
             jumpTo(editor, charone, chartwo, direction)
             lastSymbols = "${charone}${chartwo}"
             lastSDirection = direction
         }
 
-        private fun getChar(editor: Editor): Char {
+        private fun getChar(editor: Editor): Char? {
             val key = VimExtensionFacade.inputKeyStroke(editor)
-            val keyChar = key.keyChar
-            return if (keyChar == KeyEvent.CHAR_UNDEFINED || keyChar.toInt() == KeyEvent.VK_ESCAPE) {
-                0.toChar()
-            } else keyChar
+            return when(key.keyCode) {
+                KeyEvent.VK_UNDEFINED, KeyEvent.VK_ESCAPE -> null
+                else -> key.keyChar
+            }
         }
     }
 

@@ -243,5 +243,4 @@ class IdeaVimSneakExtension : VimExtension {
             Font.PLAIN
         )
     }
-
 }

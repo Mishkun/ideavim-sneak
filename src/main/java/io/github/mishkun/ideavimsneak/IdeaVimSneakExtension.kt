@@ -34,6 +34,7 @@ import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.extension.highlightedyank.DEFAULT_HIGHLIGHT_DURATION
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.option.StrictMode
+import com.maddyhome.idea.vim.option.OptionsManager
 import java.awt.Font
 import java.awt.event.KeyEvent
 import java.util.concurrent.Executors
@@ -124,9 +125,18 @@ class IdeaVimSneakExtension : VimExtension {
     private enum class Direction(val offset: Int) {
         FORWARD(1) {
             override fun findBiChar(charSequence: CharSequence, position: Int, charone: Char, chartwo: Char): Int? {
+                var match: Boolean
+
                 for (i in (position + offset) until charSequence.length - 1) {
-                    if (charSequence[i] == charone &&
-                            charSequence[i + 1] == chartwo) {
+                    match = charSequence[i].equals(charone, ignoreCase = OptionsManager.ignorecase.isSet) &&
+                            charSequence[i + 1].equals(chartwo, ignoreCase = OptionsManager.ignorecase.isSet)
+                    if (OptionsManager.ignorecase.isSet && OptionsManager.smartcase.isSet) {
+                        if (charone.isUpperCase() || chartwo.isUpperCase()) {
+                            match = charSequence[i].equals(charone, ignoreCase = false) &&
+                                    charSequence[i + 1].equals(chartwo, ignoreCase = false)
+                        }
+                    }
+                    if (match) {
                         return i
                     }
                 }
@@ -135,9 +145,18 @@ class IdeaVimSneakExtension : VimExtension {
         },
         BACKWARD(-1) {
             override fun findBiChar(charSequence: CharSequence, position: Int, charone: Char, chartwo: Char): Int? {
+                var match: Boolean
+
                 for (i in (position + offset) downTo 0) {
-                    if (charSequence[i] == charone &&
-                            charSequence[i + 1] == chartwo) {
+                    match = charSequence[i].equals(charone, ignoreCase = OptionsManager.ignorecase.isSet) &&
+                            charSequence[i + 1].equals(chartwo, ignoreCase = OptionsManager.ignorecase.isSet)
+                    if (OptionsManager.ignorecase.isSet && OptionsManager.smartcase.isSet) {
+                        if (charone.isUpperCase() || chartwo.isUpperCase()) {
+                            match = charSequence[i].equals(charone, ignoreCase = false) &&
+                                    charSequence[i + 1].equals(chartwo, ignoreCase = false)
+                        }
+                    }
+                    if (match) {
                         return i
                     }
                 }
@@ -224,4 +243,5 @@ class IdeaVimSneakExtension : VimExtension {
             Font.PLAIN
         )
     }
+
 }

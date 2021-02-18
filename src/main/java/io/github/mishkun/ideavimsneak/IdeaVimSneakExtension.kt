@@ -125,18 +125,8 @@ class IdeaVimSneakExtension : VimExtension {
     private enum class Direction(val offset: Int) {
         FORWARD(1) {
             override fun findBiChar(charSequence: CharSequence, position: Int, charone: Char, chartwo: Char): Int? {
-                var match: Boolean
-
                 for (i in (position + offset) until charSequence.length - 1) {
-                    match = charSequence[i].equals(charone, ignoreCase = OptionsManager.ignorecase.isSet) &&
-                            charSequence[i + 1].equals(chartwo, ignoreCase = OptionsManager.ignorecase.isSet)
-                    if (OptionsManager.ignorecase.isSet && OptionsManager.smartcase.isSet) {
-                        if (charone.isUpperCase() || chartwo.isUpperCase()) {
-                            match = charSequence[i].equals(charone, ignoreCase = false) &&
-                                    charSequence[i + 1].equals(chartwo, ignoreCase = false)
-                        }
-                    }
-                    if (match) {
+                    if (matches(charSequence, i, charone, chartwo)) {
                         return i
                     }
                 }
@@ -145,18 +135,8 @@ class IdeaVimSneakExtension : VimExtension {
         },
         BACKWARD(-1) {
             override fun findBiChar(charSequence: CharSequence, position: Int, charone: Char, chartwo: Char): Int? {
-                var match: Boolean
-
                 for (i in (position + offset) downTo 0) {
-                    match = charSequence[i].equals(charone, ignoreCase = OptionsManager.ignorecase.isSet) &&
-                            charSequence[i + 1].equals(chartwo, ignoreCase = OptionsManager.ignorecase.isSet)
-                    if (OptionsManager.ignorecase.isSet && OptionsManager.smartcase.isSet) {
-                        if (charone.isUpperCase() || chartwo.isUpperCase()) {
-                            match = charSequence[i].equals(charone, ignoreCase = false) &&
-                                    charSequence[i + 1].equals(chartwo, ignoreCase = false)
-                        }
-                    }
-                    if (match) {
+                    if (matches(charSequence, i, charone, chartwo)) {
                         return i
                     }
                 }
@@ -165,6 +145,19 @@ class IdeaVimSneakExtension : VimExtension {
 
         };
         abstract fun findBiChar(charSequence: CharSequence, position: Int, charone: Char, chartwo: Char): Int?
+
+        fun matches(charSequence: CharSequence, charPosition: Int, charOne: Char, charTwo: Char): Boolean {
+            var match = charSequence[charPosition].equals(charOne, ignoreCase = OptionsManager.ignorecase.isSet) &&
+                    charSequence[charPosition + 1].equals(charTwo, ignoreCase = OptionsManager.ignorecase.isSet)
+
+            if (OptionsManager.ignorecase.isSet && OptionsManager.smartcase.isSet) {
+                if (charOne.isUpperCase() || charTwo.isUpperCase()) {
+                    match = charSequence[charPosition].equals(charOne, ignoreCase = false) &&
+                            charSequence[charPosition + 1].equals(charTwo, ignoreCase = false)
+                }
+            }
+            return match
+        }
     }
 
     private enum class RepeatDirection(val symb: String) {

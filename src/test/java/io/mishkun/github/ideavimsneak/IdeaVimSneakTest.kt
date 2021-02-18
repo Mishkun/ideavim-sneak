@@ -18,6 +18,7 @@
 package io.mishkun.github.ideavimsneak
 
 import com.maddyhome.idea.vim.command.CommandState
+import junit.framework.TestCase
 
 class IdeaVimSneakTest : VimTestCase() {
     @Throws(Exception::class)
@@ -49,6 +50,30 @@ class IdeaVimSneakTest : VimTestCase() {
         val after = "som${c}e teXt"
 
         doTest("sxt", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    }
+
+    fun testSneakForwardIgnoreCase() {
+        val before = "som${c}e teXt"
+        val after = "some te${c}Xt"
+
+        enableExtensions("ignorecase")
+
+        doTest("sxt", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+        doTest("sXt", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+        doTest("sXT", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+        doTest("sxT", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    }
+
+    fun testSneakForwardSmartIgnoreCase() {
+        val before = "som${c}e teXt"
+        val after = "some te${c}Xt"
+
+        enableExtensions("ignorecase", "smartcase")
+
+        doTest("sxt", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+        doTest("sXt", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+        doTest("sXT", before, before, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+        doTest("sxT", before, before, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
     fun testSneakForwardAndFindAgain() {

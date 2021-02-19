@@ -7,7 +7,7 @@ plugins {
 
 
 group = "io.github.mishkun"
-version = "1.1.1"
+version = "1.2.0"
 
 repositories {
     mavenCentral()
@@ -30,9 +30,7 @@ tasks.withType<PublishTask> {
 
 tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml") {
     changeNotes("""
-        - Enable escape symbol for interrupting sneak movement
-        - Add highlighting to found chars
-        - Update IdeaVim to 0.61
+        Thanks to @MunsterPlop for adding support for `set ignorecase` and `set smartcase` in this release!
       """)
     setSinceBuild("201")
     setUntilBuild("")

@@ -4,9 +4,9 @@
     <vendor email="mishkun.lev@gmail.com">Mishkun</vendor>
 
     <description><![CDATA[
-    <p>
+    <h2>
     Port of <a href="https://github.com/justinmk/vim-sneak">vim-sneak</a> – vim's missing motion to ideavim.
-    </p>
+    </h2>
 
     <p>
     It helps you navigate in line effortlessly.
@@ -14,13 +14,17 @@
     more precise and accurate.
     </p>
 
+    <h3>Usage</h3>
+    <p>Add `set sneak` to your ./ideavimrc file for activation</p>
+
     <ul>
     <li>Use `s` plus two characters to search forward in document</li>
     <li>Use `S` plus two characters to search backward in document</li>
     <li>Use `;` and `,` just as with `f` and `F` commands to repeat searches</li>
     </ul>
 
-    <p>Add `set sneak` to your ./ideavimrc file for activation</p>
+    <h3>Advanced</h3>
+    <p>Plugin respects `set ignorecase` and `set smartcase` settings</p>
     ]]></description>
 
     <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html

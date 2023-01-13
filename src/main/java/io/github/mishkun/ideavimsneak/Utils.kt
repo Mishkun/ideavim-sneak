@@ -29,14 +29,14 @@ import com.maddyhome.idea.vim.helper.StringHelper
  */
 fun VimExtension.mapToFunctionAndProvideKeys(keys: String, handler: VimExtensionHandler) {
     VimExtensionFacade.putExtensionHandlerMapping(
-        MappingMode.NVO,
+        MappingMode.NXO,
         StringHelper.parseKeys(command(keys)),
         owner,
         handler,
         false
     )
     VimExtensionFacade.putKeyMapping(
-        MappingMode.NVO,
+        MappingMode.NXO,
         StringHelper.parseKeys(keys),
         owner,
         StringHelper.parseKeys(command(keys)),

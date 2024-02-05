@@ -1,6 +1,21 @@
 <img src="src/main/resources/META-INF/pluginIcon.svg" width="80" height="80" alt="icon" align="left"/>
 
-# IdeaVim-Sneak
+# IdeaVim-Sneak (no longer supported)
+
+---
+# !!Archive Mode Notice!!
+
+This plugin was bruteforcefully hacked for my personal use several years ago. It uses some dirty tricks and is not maintainable. I am very grateful for all of the users of this plugin and also people who contributed to make it less messy. I do not use it daily for more than a year and can't justify maintaining it anymore. As of IdeaVim version 2.8.0 it stopped working.
+
+Feel free to transfer the functionality of this plugin to the core [IdeaVim](https://github.com/JetBrains/ideavim) repo or to try and hack support of original vimscript plugin using IdeaVim vimscript support. If you manage to do this, get in touch with me, I will update this maintenance disclaimer with the link to your project!
+
+Also check out my much more useful plugin for supporting leader-key bindings in Intellij products: [Ataman](https://github.com/Mishkun/ataman-intellij)
+
+It was a great journey, cheers!
+
+Mikhail Levchenko, creator of ideavim-sneak
+
+---
 
 [![JetBrains IntelliJ Plugins](https://img.shields.io/jetbrains/plugin/v/15348-ideavim-sneak?label=dowload%20plugin)](https://plugins.jetbrains.com/plugin/15348-ideavim-sneak) 
 

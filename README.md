@@ -39,7 +39,7 @@ After IdeaVim reboot you can use this plugin
 
 ## License
 
-Just as IdeaVim, this plugin is licensed under the terms of the GNU Public License version 3 or any later version.
+Just as IdeaVim, this plugin is licensed under the terms of the MIT License.
 
 ## Credits
 
